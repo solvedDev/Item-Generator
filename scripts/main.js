@@ -40,6 +40,9 @@ function updateGUI() {
 	if(itemJSON && entityJSON) {
 		var _allDoneIcon = document.querySelectorAll("button#parse-json i")[0];
 		_allDoneIcon.style.display = "inline-block";
+
+		var _errorDiv = document.querySelector(".error");
+		_errorDiv.style.display = "none";
 	}
 }
 
@@ -92,7 +95,7 @@ document.getElementById("parse-json").addEventListener("click", function(){
 	}
 	updateGUI();
 
-	//location.reload();
+	location.reload();
 });
 
 
