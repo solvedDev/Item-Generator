@@ -16,7 +16,7 @@ This is an example of a simple item behavior:
 		{
 			"name": "test",
 			"item_replacement": "wooden_sword",
-			"activatation_domain": "hand",
+			"activation_domain": "hand",
 			"consumable": false,
 			"on_use": {
 				"minecraft:health": {
