@@ -19,7 +19,7 @@ This is an example of a simple item behavior:
 			"activation_domain": "hand",
 			"focus_behavior": {
 				"consumable": false,
-				"turn_into": "glass_bottle"
+				"turn_into": "potion:0"
 			},
 			"on_use": {
 				"add_components": {
