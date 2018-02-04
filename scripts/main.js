@@ -52,12 +52,21 @@ document.getElementById("apply-to-file").addEventListener("change", function(){
 });
 
 document.getElementById("parse-json").addEventListener("click", function(){
-	items = itemJSON.items;
-	prefix = itemJSON.project.prefix;
+	try {
+		items = itemJSON.items;
+		prefix = itemJSON.project.prefix;
+	
+		toMinecraftJSON(items);
+	
+		buildStandardComponentGroup();
+	} 
+	catch(error) {
+		var _errorDiv = document.querySelector(".error");
+		_errorDiv.lastChild.textContent = " " + error.message;
+		_errorDiv.style.display = "inline-block";
+	}
 
-	toMinecraftJSON(items);
-
-	buildStandardComponentGroup();
+	//location.reload();
 });
 
 
@@ -149,6 +158,10 @@ function buildStandardComponentGroup() {
 	for(key in components) {
 		components[key] = entityJSON["minecraft:entity"].components[key];
 		delete entityJSON["minecraft:entity"].components[key];
+	}
+
+	for(key in itemJSON.force_component_reset) {
+		components[key] = itemJSON.force_component_reset[key];
 	}
 }
 

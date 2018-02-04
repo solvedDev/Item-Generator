@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Item Generator</title>
+	<link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+	<link rel="stylesheet" href="styles/main.css">
+</head>
+<body>
+	<h1>Item Generator</h1>
+	<div class="error">
+		<i class="material-icons">warning</i>
+		<p>
+			Error: 
+		</p>
+		<br>
+	</div>
+	<br>
+	<br>
+
+	<div class="main">
+		<div class="input">
+			<label for="apply-to-file">Entity JSON</label>
+			<input type="file" id="apply-to-file" name="apply-to-file">
+		</div>
+		<br>
+		<br>
+
+		<div class="input">
+			<label for="json-input">Item JSON</label>
+			<input type="file" id="json-input" name="json-input">
+		</div>
+		<br>
+
+		<input type="button" value="Parse" id="parse-json">
+	</div>
+
+	<script src="scripts/main.js"></script>
+</body>
+</html>
