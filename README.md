@@ -6,9 +6,10 @@ Download this repository and navigate to the index.html file. Open it in your br
 
 ## The syntax
 This is an example of a simple item behavior:
->{
->	"project": {
-		"name": "exampleProject",
+```javascript
+{
+	"project": {
+		"name": "xxx",
 		"prefix": "example"
 	},
 	"items": [
@@ -29,3 +30,5 @@ This is an example of a simple item behavior:
 		}
 	]
 }
+```
+
