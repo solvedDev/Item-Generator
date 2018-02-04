@@ -9,7 +9,7 @@ This is an example of a simple item behavior:
 ```javascript
 {
 	"project": {
-		"name": "xxx",
+		"name": "exampleName",
 		"prefix": "example"
 	},
 	"items": [
