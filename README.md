@@ -7,8 +7,8 @@ Download this repository and navigate to the index.html file. Open it in your br
 ## The syntax
 This is an example of a simple item behavior:
 >{
-	"project": {
-		"name": "xxx",
+>	"project": {
+		"name": "exampleProject",
 		"prefix": "example"
 	},
 	"items": [
