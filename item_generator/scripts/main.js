@@ -103,7 +103,7 @@ function buildLoop(pItem) {
 
 	var loop = new sensorTemplate();
 	loop.on_environment.filters.any_of[0].value = pItem.item_replacement;
-	loop.on_environment.filters.any_of[0].domain = pItem.activate_domain;
+	loop.on_environment.filters.any_of[0].domain = pItem.activation_domain;
 
 	if(pItem.consumable) {
 		loop.on_environment.event = prefix + ":on_" + pItem.name + "_use";
