@@ -26,6 +26,7 @@ function resetSensorTemplate() {
 	}
 };
 
+//GUI
 document.getElementById("json-input").addEventListener("change", function(){
 	var fileList = this.files;
 	var reader = new FileReader();
@@ -59,6 +60,8 @@ document.getElementById("parse-json").addEventListener("click", function(){
 	buildStandardComponentGroup();
 });
 
+
+//MAIN
 function toMinecraftJSON(pItems) {
 	components = { };
 	var resetEvent = { add: { component_groups: [ prefix + ":standard_player" ] }, remove: { component_groups: [ ] } };
@@ -79,7 +82,7 @@ function toMinecraftJSON(pItems) {
 		environment_sensor.push(buildLoop(pItems[i]));
 
 		//Event
-		if(pItems[i].consumable) {
+		if(pItems[i].focus_behavior.consumable) {
 			events[prefix + ":on_" + pItems[i].name + "_use"] = buildEvent(pItems[i], resetEvent);
 		}
 		else {
@@ -94,49 +97,52 @@ function toMinecraftJSON(pItems) {
 	events[ prefix + ":reset_player" ] = resetEvent;
 	events[ "minecraft:entity_spawned" ] = standardEvent;
 
+	//This method analyzes which components are used for the item behavior, 
+	//removes them from the "components"-object and moves them into an own component group
 	buildStandardComponentGroup();
 	component_groups[ prefix + ":standard_player" ] = components;
 
+	//Combining the JSON and creating the output file
 	combineJSON( environment_sensor, events, component_groups );
 }
 
 function buildLoop(pItem) {
-	var loop = {};
+	var _loop = {};
 
-	var loop = new sensorTemplate();
-	loop.on_environment.filters.any_of[0].value = pItem.item_replacement;
-	loop.on_environment.filters.any_of[0].domain = pItem.activation_domain;
+	var _loop = new sensorTemplate();
+	_loop.on_environment.filters.any_of[0].value = pItem.item_replacement;
+	_loop.on_environment.filters.any_of[0].domain = pItem.activation_domain;
 
-	if(pItem.consumable) {
-		loop.on_environment.event = prefix + ":on_" + pItem.name + "_use";
+	if(pItem.focus_behavior.consumable) {
+		_loop.on_environment.event = prefix + ":on_" + pItem.name + "_use";
 	}
 	else {
-		loop.on_environment.event = prefix + ":holds_" + pItem.name;
+		_loop.on_environment.event = prefix + ":holds_" + pItem.name;
 	}
 
-	return loop;
+	return _loop;
 }
 
 function buildEvent(pItem, pResetEvent) {
-	var mEvent = { };
-	mEvent.add = { component_groups: [  ] };
-	mEvent.remove = { component_groups: [ ] };
+	var _mEvent = { };
+	_mEvent.add = { component_groups: [  ] };
+	_mEvent.remove = { component_groups: [ ] };
 
-	var cGroup = prefix + ":" + pItem.name;
-	mEvent.add.component_groups.push( cGroup );
-	pResetEvent.remove.component_groups.push( cGroup );
+	var _cGroup = prefix + ":" + pItem.name;
+	_mEvent.add.component_groups.push( _cGroup );
+	pResetEvent.remove.component_groups.push( _cGroup );
 
-	return mEvent;
+	return _mEvent;
 }
 
 function buildComponentGroup(pItem) {
-	var component_group = pItem.on_use;
+	var _component_group = pItem.on_use.add_components;
 
-	for(key in pItem.on_use) {
-		components[key] = pItem.on_use[key];
+	for(key in pItem.on_use.add_components) {
+		components[key] = pItem.on_use.add_components[key];
 	}
 
-	return component_group;
+	return _component_group;
 }
 
 function buildStandardComponentGroup() {
