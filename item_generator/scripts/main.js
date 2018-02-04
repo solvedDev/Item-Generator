@@ -62,6 +62,7 @@ document.getElementById("parse-json").addEventListener("click", function(){
 function toMinecraftJSON(pItems) {
 	components = { };
 	var resetEvent = { add: { component_groups: [ prefix + ":standard_player" ] }, remove: { component_groups: [ ] } };
+	var standardEvent = { add: { component_groups: [ prefix + ":standard_player" ] } };
 
 	var environment_sensor = [ ];
 	var events = { };
@@ -91,6 +92,7 @@ function toMinecraftJSON(pItems) {
 	}
 	
 	events[ prefix + ":reset_player" ] = resetEvent;
+	events[ "minecraft:entity_spawned" ] = standardEvent;
 
 	buildStandardComponentGroup();
 	component_groups[ prefix + ":standard_player" ] = components;
