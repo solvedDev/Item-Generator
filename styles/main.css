@@ -23,6 +23,10 @@ div.main {
 	text-align: center;
 }
 
+div.input i {
+	display: none;
+}
+
 div.error {
 	background-color: #A14A4A;
 	padding: 5px;
@@ -63,7 +67,7 @@ input[type=file] {
 	z-index: -1;
 }
 
-input[type=button] {
+button {
 	margin: 20px;
 
 	padding: 10px;
@@ -75,6 +79,10 @@ input[type=button] {
 	cursor: pointer;
 }
 
-input[type=button]:hover {
+button:hover {
 	background-color: #5A861F;
+}
+
+button#parse-json i {
+	display: none;
 }

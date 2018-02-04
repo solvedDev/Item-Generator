@@ -26,6 +26,23 @@ function resetSensorTemplate() {
 	}
 };
 
+function updateGUI() {
+	if(itemJSON) {
+		var _doneIcon = document.querySelectorAll("div.input i")[1];
+		_doneIcon.style.display = "inline-block";
+	}
+
+	if(entityJSON) {
+		var _doneIcon = document.querySelectorAll("div.input i")[0];
+		_doneIcon.style.display = "inline-block";
+	}
+
+	if(itemJSON && entityJSON) {
+		var _allDoneIcon = document.querySelectorAll("button#parse-json i")[0];
+		_allDoneIcon.style.display = "inline-block";
+	}
+}
+
 //GUI
 document.getElementById("json-input").addEventListener("change", function(){
 	var fileList = this.files;
@@ -33,9 +50,11 @@ document.getElementById("json-input").addEventListener("change", function(){
 	
 	//Reading file
 	reader.readAsText(fileList[0]);
-
+	reader.callback = updateGUI;
 	reader.onload = function() {
 		itemJSON = JSON.parse(reader.result);
+		
+		this.callback();
 	};
 });
 
@@ -46,13 +65,19 @@ document.getElementById("apply-to-file").addEventListener("change", function(){
 	//Reading file
 	reader.readAsText(fileList[0]);
 	editedFile = fileList[0].name;
+	reader.callback = updateGUI;
 	reader.onload = function() {
 		entityJSON = JSON.parse(reader.result);
+		
+		this.callback();
 	};
 });
 
 document.getElementById("parse-json").addEventListener("click", function(){
 	try {
+		if(!itemJSON || !entityJSON) {
+			throw new Error("Please select all files first!");
+		}
 		items = itemJSON.items;
 		prefix = itemJSON.project.prefix;
 	
@@ -65,6 +90,7 @@ document.getElementById("parse-json").addEventListener("click", function(){
 		_errorDiv.lastChild.textContent = " " + error.message;
 		_errorDiv.style.display = "inline-block";
 	}
+	updateGUI();
 
 	//location.reload();
 });
@@ -147,7 +173,7 @@ function buildEvent(pItem, pResetEvent) {
 function buildComponentGroup(pItem) {
 	var _component_group = pItem.on_use.add_components;
 
-	for(key in pItem.on_use.add_components) {
+	for(var key in pItem.on_use.add_components) {
 		components[key] = pItem.on_use.add_components[key];
 	}
 
@@ -155,12 +181,12 @@ function buildComponentGroup(pItem) {
 }
 
 function buildStandardComponentGroup() {
-	for(key in components) {
+	for(var key in components) {
 		components[key] = entityJSON["minecraft:entity"].components[key];
 		delete entityJSON["minecraft:entity"].components[key];
 	}
 
-	for(key in itemJSON.force_component_reset) {
+	for(var key in itemJSON.force_component_reset) {
 		components[key] = itemJSON.force_component_reset[key];
 	}
 }
