@@ -86,7 +86,8 @@ document.getElementById("parse-json").addEventListener("click", function(){
 	
 		toMinecraftJSON(items);
 	
-		buildStandardComponentGroup();
+		buildStandardComponentGroup();	
+		location.reload();
 	} 
 	catch(error) {
 		var _errorDiv = document.querySelector(".error");
@@ -94,8 +95,6 @@ document.getElementById("parse-json").addEventListener("click", function(){
 		_errorDiv.style.display = "inline-block";
 	}
 	updateGUI();
-
-	location.reload();
 });
 
 
