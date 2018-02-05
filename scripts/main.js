@@ -4,12 +4,16 @@ var components;
 var itemJSON;
 var entityJSON;
 var editedFile;
+var eB = new EventBuilder();
 
 function sensorTemplate() {
 	this.on_environment = {
 		filters: { 
 			any_of: [
 				{ test: "has_equipment", subject: "self", domain: "hand", value: "" }
+			],
+			all_of: [
+
 			]
 		},
 		event: ""
@@ -118,17 +122,14 @@ function toMinecraftJSON(pItems) {
 		//Loop
 		environment_sensor.push(buildLoop(pItems[i]));
 
-		//Event
-		if(pItems[i].focus_behavior.consumable) {
-			events[prefix + ":on_" + pItems[i].name + "_use"] = buildEvent(pItems[i], resetEvent);
-		}
-		else {
-			events[prefix + ":holds_" + pItems[i].name] = buildEvent(pItems[i], resetEvent);
-		}
-
-		//Component Group
-		component_groups[ prefix + ":" + pItems[i].name ] = buildComponentGroup(pItems[i]);
+		//Test whether no custom event is defined
+		if(!pItems[i].on_use.custom_event) {
+			//Event
+			events[eB.getEventName(pItems[i])] = buildEvent(pItems[i], resetEvent);
 		
+			//Component Group
+			component_groups[ prefix + ":" + pItems[i].name ] = buildComponentGroup(pItems[i]);
+		}
 	}
 	
 	events[ prefix + ":reset_player" ] = resetEvent;
@@ -144,19 +145,12 @@ function toMinecraftJSON(pItems) {
 }
 
 function buildLoop(pItem) {
-	var _loop = {};
-
 	var _loop = new sensorTemplate();
 	_loop.on_environment.filters.any_of[0].value = pItem.item_replacement;
 	_loop.on_environment.filters.any_of[0].domain = pItem.activation_domain;
-
-	if(pItem.focus_behavior.consumable) {
-		_loop.on_environment.event = prefix + ":on_" + pItem.name + "_use";
-	}
-	else {
-		_loop.on_environment.event = prefix + ":holds_" + pItem.name;
-	}
-
+	
+	_loop.on_environment.event = eB.getEventName(pItem);
+	
 	return _loop;
 }
 
@@ -191,6 +185,10 @@ function buildStandardComponentGroup() {
 	for(var key in itemJSON.force_component_reset) {
 		components[key] = itemJSON.force_component_reset[key];
 	}
+
+	for(var i = 0; i < itemJSON.force_component_removal.length; i++) {
+		delete components[itemJSON.force_component_removal[i]];
+	}
 }
 
 function combineJSON(pEnvironment_sensor, pEvents, pComponent_groups) {
@@ -202,17 +200,4 @@ function combineJSON(pEnvironment_sensor, pEvents, pComponent_groups) {
 
 	console.log(result);
 	download(editedFile, result);
-}
-
-function download(filename, text) {
-	var element = document.createElement('a');
-	element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
-	element.setAttribute('download', filename);
-  
-	element.style.display = 'none';
-	document.body.appendChild(element);
-  
-	element.click();
-	
-	document.body.removeChild(element);
 }
