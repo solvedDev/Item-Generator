@@ -70,8 +70,7 @@ document.getElementById("parse-json").addEventListener("click", function(){
 			prefix = itemJSON.project.prefix;
 		
 			toMinecraftJSON(items);
-		
-			buildStandardComponentGroup();	
+	
 			if(!devBuild) location.reload();
 		} 
 		catch(error) {
@@ -85,8 +84,7 @@ document.getElementById("parse-json").addEventListener("click", function(){
 		prefix = itemJSON.project.prefix;
 	
 		toMinecraftJSON(items);
-	
-		buildStandardComponentGroup();	
+
 		if(!devBuild) location.reload();
 	}
 });
@@ -144,17 +142,25 @@ function toMinecraftJSON(pItems) {
 
 function buildStandardComponentGroup() {
 	console.log("Started building standard player...");
+	console.log(components);
 	for(var key in components) {
+		console.log(entityJSON["minecraft:entity"].components[key]);
 		components[key] = entityJSON["minecraft:entity"].components[key];
+		console.log(entityJSON["minecraft:entity"].components[key]);
+		console.log(components[key]);
 		delete entityJSON["minecraft:entity"].components[key];
 	}
 
-	for(var key in itemJSON.force_component_reset) {
-		components[key] = itemJSON.force_component_reset[key];
+	if(itemJSON.force_component_reset) {
+		for(var key in itemJSON.force_component_reset) {
+			components[key] = itemJSON.force_component_reset[key];
+		}
 	}
 
-	for(var i = 0; i < itemJSON.force_component_removal.length; i++) {
-		delete components[itemJSON.force_component_removal[i]];
+	if(itemJSON.force_component_removal) {
+		for(var i = 0; i < itemJSON.force_component_removal.length; i++) {
+			delete components[itemJSON.force_component_removal[i]];
+		}
 	}
 }
 
@@ -184,7 +190,6 @@ function removeEmptyFilters(pEnvironment_sensor) {
 	for(var key in pEnvironment_sensor) {
 		if(pEnvironment_sensor[key].on_environment) {
 			var _tmp = pEnvironment_sensor[key].on_environment.filters;
-			console.log(_tmp);
 			if(_tmp.any_of != undefined && _tmp.any_of.length == 0) {
 				delete _tmp.any_of;
 			}
