@@ -29,10 +29,14 @@ This is an example of a simple item behavior:
 				"consumable": false,
 				"turn_into": {
 					"item_name": "potion",
-					"data": 0,
-					"count": 1
+					"item_data": 0,
+					"item_count": 1
 				},
-				"active_effect_time": 10
+				"consume_effect": {
+					"duration": 10,
+					"allow_renewing": true,
+					"custom_remove_event": "example:reset_player"
+				}
 			},
 			"on_use": {
 				"custom_event": "example:holds_example",
@@ -73,3 +77,31 @@ Some components do not work well with standard values on the player or simply do
 
 ## Loot Tables
 The consumable items need a loot table. This program automatically generates it and you just need create a folder called your ```prefix``` name inside the loot tables folder and put the file inside it.
+
+##	Confused?
+Here's the most basic layout of a custom (non-consumable) item:
+```javascript
+{
+	"project": {
+		"name": "exampleName",
+		"prefix": "example"
+	},
+	"items": [
+		{
+			"name": "ruby_sword",
+			"item_replacement": "wooden_hoe",
+			"activation_domain": "hand",
+			"focus_behavior": {
+				"consumable": false
+			},
+			"on_use": {
+				"add_components": {
+					"minecraft:attack": {
+						"damage": 9
+					}
+				}
+			}
+		}
+	]
+}
+```

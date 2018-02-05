@@ -11,6 +11,23 @@ function download(filename, text) {
 	document.body.removeChild(element);
 }
 
+class TimerGroupTemplate {
+	constructor(pDuration, pEvent, pTable) {
+		this["minecraft:timer"] = {
+			time: pDuration,
+			looping: false,
+			time_down_event: {
+			  event: pEvent,
+			  target: "self"
+			}
+		}
+
+		this["minecraft:equipment"] = {
+			table: "loot_tables/" + pTable
+		}
+	}
+}
+
 class SensorTemplate {
 	constructor(pReset) {
 		if(pReset) {
