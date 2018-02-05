@@ -11,6 +11,34 @@ function download(filename, text) {
 	document.body.removeChild(element);
 }
 
+class SensorTemplate {
+	constructor(pReset) {
+		if(pReset) {
+			this.on_environment = {
+				filters: { 
+					any_of: [
+						{ test: "is_family", subject: "self", value: "player" }
+					]
+				},
+				event: ""
+			}
+		}
+		else {
+			this.on_environment = {
+				filters: { 
+					all_of: [
+						{ test: "has_equipment", subject: "self", domain: "", value: "" }
+					],
+					any_of: [
+		
+					]
+				},
+				event: ""
+			}
+		}
+	}
+}
+
 class EventBuilder {
 	constructor() {
 		
