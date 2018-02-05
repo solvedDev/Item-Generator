@@ -1,4 +1,4 @@
-var devBuild = true;
+var devBuild = false;
 var items = [];
 var prefix;
 var components;
