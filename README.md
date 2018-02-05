@@ -49,7 +49,7 @@ Within the ```project``` object, one defines a prefix for the whole project. One
 
 After the project definition, one defines the items.
 1. ```name``` = The name of the item  
-2. ```item_replacement``` = The item to apply the new behavior to. In order to use data values, simply enter them behind the item ("dye:4").* 
+2. ```item_replacement``` = The item to apply the new behavior to. In order to use data values, simply enter them behind the item ("dye:4").  
 3. ```activate_domain``` = Where the item has to be in order to be considered "activated". Valid inputs are the ones supported by the has_equipment filter by Minecraft (any, armor, feet, hand, head, leg, torso).  
 4. ```focus_behavior``` = Define what happens if the player holds the item here. ```consumable``` allows to input *true*/*false* and ```turn_into``` defines which item the player holds after consuming the original item. Use ```active_effect_time``` to set how long the component groups should stay on the player.
 5. ```on_use``` = Put the components which shall be added while holding/using the item into the ```add_components``` object. The syntax follows the default Minecraft syntax and one can input any component though some might not work or cause Minecraft to crash. Define a ```custom_event``` to fire when the player holds this item. The automatically generated events follow this naming convention: *prefix:holds_itemName*, *prefix:on_itemName_use* and *prefix:reset_player*. Normally, one doesn't need the custom event so just do not use it if you don't know what you do! The other arguments are a work-in-progress.
