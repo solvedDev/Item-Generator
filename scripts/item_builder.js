@@ -1,3 +1,5 @@
+var totalConsumableItems = 0;
+
 class ItemBuilder {
 	constructor(pPrefix, pEnvironment_sensor, pEvents, pComponent_groups) {
 		this._prefix = pPrefix;
@@ -9,15 +11,25 @@ class ItemBuilder {
 	buildItem(pItem, pResetEvent) {
 		//If consumable item, create consume-loot_table
 		if(pItem.focus_behavior.consumable) {
+			totalConsumableItems++;
+
+			if(!pItem.focus_behavior.turn_into) {
+				throw new Error("Please define an item under 'turn_into'!");
+			}
+
 			var _tmp = pItem.focus_behavior.turn_into;
 			var table = new LootTable( "consume_" + pItem.name, _tmp.item_name, _tmp.item_data, _tmp.item_count );
 			table.downloadTable();
 
 			this.buildEffectTimer(pItem);
-		}
 
-		//Loop
-		this._environment_sensor.push(this.buildLoop(pItem));
+			//Loop: A consumable item needs to be before normal items in the environment_sensor
+			this._environment_sensor.splice(1, 0, this.buildLoop(pItem));
+		}
+		else {
+			//Loop
+			this._environment_sensor.push(this.buildLoop(pItem));
+		}
 		
 		//Test whether no custom event is defined
 		if(!pItem.on_use.custom_event) {
@@ -43,9 +55,17 @@ class ItemBuilder {
 	}	
 
 	buildLoop(pItem) {
-		var _loop = new SensorTemplate(false);
-		_loop.on_environment.filters.all_of[0].value = pItem.item_replacement;
-		_loop.on_environment.filters.all_of[0].domain = pItem.activation_domain;
+		if(pItem.focus_behavior.consumable) {
+			var _loop = new SensorTemplate("consume");
+			_loop.on_environment.filters.any_of[0].value = pItem.item_replacement;
+			_loop.on_environment.filters.any_of[0].domain = pItem.activation_domain;
+			_loop.on_environment.filters.any_of[1].value =  this._prefix + ":effect_" + pItem.name;
+		}
+		else {
+			var _loop = new SensorTemplate("standard");
+			_loop.on_environment.filters.all_of[0].value = pItem.item_replacement;
+			_loop.on_environment.filters.all_of[0].domain = pItem.activation_domain;
+		}
 	
 		if(pItem.filters) {
 			var _tmp = _loop.on_environment.filters.any_of;
@@ -61,24 +81,77 @@ class ItemBuilder {
 	}
 
 	buildEvent(pItem, pResetEvent) {
-		var _mEvent = { };
-		_mEvent.add = { component_groups: [  ] };
-		_mEvent.remove = { component_groups: [ ] };
-		
 		var _cGroup = this._prefix + ":" + pItem.name;
-		_mEvent.add.component_groups.push( _cGroup );
+
+		if (pItem.focus_behavior.consumable) {
+			var _effect = pItem.focus_behavior.consume_effect;
+			var _effectName = this._prefix + ":active_" + pItem.name + "_timer_" + _effect.duration + "s";
+
+			var _mEvent = new EffectEventTemplate( this._prefix + ":effect_" + pItem.name, this._prefix + ":" + pItem.name, _effectName, pItem.item_replacement );
+			pResetEvent.remove.component_groups.push( _effectName );
+		}
+		else {
+			var _mEvent = { };
+			_mEvent.add = { component_groups: [  ] };
+			_mEvent.remove = { component_groups: [ ] };
+			
+			_mEvent.add.component_groups.push( _cGroup );
+		}
+
 		pResetEvent.remove.component_groups.push( _cGroup );
-	
 		return _mEvent;
 	}
 
 	buildComponentGroup(pItem) {
 		var _component_group = pItem.on_use.add_components;
+
+		if(pItem.focus_behavior.consumable) {
+			_component_group["minecraft:family"] = {
+				family: [ "player", this._prefix + ":effect_" + pItem.name, "active_effect"  ]
+			}
+
+			itemJSON.force_component_reset["minecraft:family"] = {
+				family: [ "player", "standard", "no_effect"  ]
+			}
+		}
 	
 		for(var key in pItem.on_use.add_components) {
 			components[key] = pItem.on_use.add_components[key];
 		}
 	
 		return _component_group;
+	}
+
+	finishEvents(pItems, pComponentGroups) {
+		var _consumableItems = this.getConsumableItems(pItems);
+		for(var i = 0; i < _consumableItems.length; i++) {
+			var _tmp = [];
+			var _effect = _consumableItems[i].focus_behavior.consume_effect;
+			var _effectName = this._prefix + ":active_" +_consumableItems[i].name + "_timer_" + _effect.duration + "s";
+			_tmp.copy(pComponentGroups);
+
+			_tmp.removeObject( this._prefix + ":" + _consumableItems[i].name );
+			_tmp.removeObject( _effectName );
+			this._events[ eB.getEventName( _consumableItems[i] ) ].sequence[0].remove.component_groups = _tmp;
+		}
+	}
+
+	upgradeGroup(pComponents, pStandardComponents) {
+		for(var key in pStandardComponents) {
+			if(!pComponents[key]) {
+				pComponents[key] = pStandardComponents[key];
+			}
+		}
+	}
+
+	getConsumableItems(pItems) {
+		var _tmp = [];
+		for(var i = 0; i < pItems.length; i++) {
+			if(pItems[i].focus_behavior.consumable) {
+				_tmp.push(pItems[i]);
+			}
+		}
+
+		return _tmp;
 	}
 }

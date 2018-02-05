@@ -58,6 +58,8 @@ document.getElementById("apply-to-file").addEventListener("change", function(){
 });
 
 document.getElementById("parse-json").addEventListener("click", function(){
+	updateGUI();
+
 	if(!devBuild) {
 		try {
 			if(!itemJSON || !entityJSON) {
@@ -87,8 +89,6 @@ document.getElementById("parse-json").addEventListener("click", function(){
 		buildStandardComponentGroup();	
 		if(!devBuild) location.reload();
 	}
-	
-	updateGUI();
 });
 
 
@@ -103,14 +103,20 @@ function toMinecraftJSON(pItems) {
 	var environment_sensor = [ ];
 	var events = { };
 	var component_groups = { };
-
-	//Building the player reset sensor
-	var resetSensor = new SensorTemplate(true);
-	resetSensor.on_environment.event = prefix + ":reset_player";
-	environment_sensor.push( resetSensor );
-
+	
 	//ItemBuilder
 	iB = new ItemBuilder(prefix, environment_sensor, events, component_groups);
+	var _consumableItems = iB.getConsumableItems(pItems);
+	
+	//Building the player reset sensor
+	if(_consumableItems.length > 0) {
+		var resetSensor = new SensorTemplate("reset_with_effects");
+	}
+	else {
+		var resetSensor = new SensorTemplate("reset");
+	}
+	resetSensor.on_environment.event = prefix + ":reset_player";
+	environment_sensor.push( resetSensor );
 
 	//Building all custom items
 	for(var i = 0; i < pItems.length; i++) {
@@ -124,8 +130,15 @@ function toMinecraftJSON(pItems) {
 	//removes them from the "components"-object and moves them into an own component group
 	buildStandardComponentGroup();
 	component_groups[ prefix + ":standard_player" ] = components;
+	for(var i = 0; i < _consumableItems.length; i++) {
+		iB.upgradeGroup( component_groups[ prefix + ":" + _consumableItems[i].name ], components );
+	}
+
+	//Adding removal of all component_groups for consumable items
+	iB.finishEvents( pItems, getComponentGroupNames( component_groups ) );
 
 	//Combining the JSON and creating the output file
+	removeEmptyFilters(environment_sensor);
 	combineJSON( environment_sensor, events, component_groups );
 }
 
@@ -156,4 +169,28 @@ function combineJSON(pEnvironment_sensor, pEvents, pComponent_groups) {
 
 	console.log(result);
 	download(editedFile, result);
+}
+
+function getComponentGroupNames(pComponentGroups) {
+	var _tmp = [];
+	for(var key in pComponentGroups) {
+		_tmp.push(key);
+	}
+
+	return _tmp;
+}
+
+function removeEmptyFilters(pEnvironment_sensor) {
+	for(var key in pEnvironment_sensor) {
+		if(pEnvironment_sensor[key].on_environment) {
+			var _tmp = pEnvironment_sensor[key].on_environment.filters;
+			console.log(_tmp);
+			if(_tmp.any_of != undefined && _tmp.any_of.length == 0) {
+				delete _tmp.any_of;
+			}
+			if(_tmp.all_of != undefined &&_tmp.all_of.length == 0) {
+				delete _tmp.all_of;
+			}
+		}
+	}
 }

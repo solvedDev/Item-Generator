@@ -11,6 +11,62 @@ function download(filename, text) {
 	document.body.removeChild(element);
 }
 
+Array.prototype.removeObject = function(pObject) {
+	for(var i = 0; i < this.length; i++) {
+		if(pObject === this[i]) {
+			return this.splice(i, 1);
+		}
+	}
+}
+
+Array.prototype.copy = function(pArray) {
+	for(var i = 0; i < pArray.length; i++) {
+		this[i] = pArray[i];
+	}
+}
+
+class EffectEventTemplate {
+	constructor(pEffect, pComponentGroupName, pEffectComponentGroup, pActivationItem) {
+		this.sequence = [
+			{
+				filters: { 
+					all_of: [
+						{ test: "is_family", subject: "self", value: pEffect }
+					]
+				},
+				remove: { component_groups: [  ]  }
+			},
+			{
+				filters: { test: "has_component", operator: "not", target: "self", value: "minecraft:timer" },
+				add: {  component_groups: [ pComponentGroupName, pEffectComponentGroup ] }
+			},
+			{
+				filters: { 
+					all_of: [
+						{ test: "has_equipment", subject: "self", domain: "hand", value: pActivationItem },
+						{ test: "is_family", subject: "self", value: pEffect },
+						{ test: "has_component", target: "self", value: "minecraft:timer" }
+					]
+			  	},
+			  	add: {  component_groups: [ pComponentGroupName, pEffectComponentGroup ] }
+			},
+			{
+			  	filters: { 
+					all_of: [
+						{ test: "is_family", subject: "self", value: pEffect },
+						{ test: "has_component", target: "self", value: "minecraft:timer" }
+					]
+			 	},
+			 	add: {  component_groups: [ pComponentGroupName ] }
+			}
+		]
+	}
+
+	stringify() {
+		return JSON.stringify(this.sequence);
+	}
+}
+
 class TimerGroupTemplate {
 	constructor(pDuration, pEvent, pTable) {
 		this["minecraft:timer"] = {
@@ -29,8 +85,18 @@ class TimerGroupTemplate {
 }
 
 class SensorTemplate {
-	constructor(pReset) {
-		if(pReset) {
+	constructor(pType) {
+		if(pType.toLowerCase() == "reset_with_effects") {
+			this.on_environment = {
+				filters: { 
+					any_of: [
+						{ test: "is_family", subject: "self", value: "standard" }
+					]
+				},
+				event: ""
+			}
+		}
+		else if(pType.toLowerCase() == "reset") {
 			this.on_environment = {
 				filters: { 
 					any_of: [
@@ -40,18 +106,33 @@ class SensorTemplate {
 				event: ""
 			}
 		}
-		else {
+		else if(pType.toLowerCase() == "standard") {
 			this.on_environment = {
 				filters: { 
 					all_of: [
 						{ test: "has_equipment", subject: "self", domain: "", value: "" }
 					],
 					any_of: [
-		
 					]
 				},
 				event: ""
 			}
+		}
+		else if(pType.toLowerCase() == "consume") {
+			this.on_environment = {
+				filters: { 
+					all_of: [
+					],
+					any_of: [
+						{ test: "has_equipment", subject: "self", domain: "", value: "" },
+						{ test: "is_family", subject: "self", value: "" }
+					]
+				},
+				event: ""
+			}
+		}
+		else {
+			throw new Error("Unknown SensorTemplate: " + pType);
 		}
 	}
 }
