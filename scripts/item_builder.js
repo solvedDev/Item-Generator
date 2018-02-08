@@ -1,4 +1,5 @@
 var totalConsumableItems = 0;
+var timerGroups = [];
 
 class ItemBuilder {
 	constructor(pPrefix, pEnvironment_sensor, pEvents, pComponent_groups) {
@@ -43,7 +44,7 @@ class ItemBuilder {
 
 	buildEffectTimer(pItem) {
 		var _effect = pItem.focus_behavior.consume_effect;
-		var _effectName = this._prefix + ":active_" + pItem.name + "_timer_" + _effect.duration + "s";
+		var _effectName = this._prefix + ":active_" + pItem.name + "_timer";
 		if(_effect.custom_remove_event) {
 			var _tGT = new TimerGroupTemplate(_effect.duration, _effect.custom_remove_event, this._prefix + "/consume_" + pItem.name + ".json");
 		}
@@ -59,7 +60,7 @@ class ItemBuilder {
 			var _loop = new SensorTemplate("consume");
 			_loop.on_environment.filters.any_of[0].value = pItem.item_replacement;
 			_loop.on_environment.filters.any_of[0].domain = pItem.activation_domain;
-			_loop.on_environment.filters.any_of[1].value =  this._prefix + ":effect_" + pItem.name;
+			_loop.on_environment.filters.any_of[1].value =  "effect_" + pItem.name;
 		}
 		else {
 			var _loop = new SensorTemplate("standard");
@@ -85,10 +86,14 @@ class ItemBuilder {
 
 		if (pItem.focus_behavior.consumable) {
 			var _effect = pItem.focus_behavior.consume_effect;
-			var _effectName = this._prefix + ":active_" + pItem.name + "_timer_" + _effect.duration + "s";
+			var _effectName = this._prefix + ":active_" + pItem.name + "_timer";
 
-			var _mEvent = new EffectEventTemplate( this._prefix + ":effect_" + pItem.name, this._prefix + ":" + pItem.name, _effectName, pItem.item_replacement );
+			var _mEvent = new EffectEventTemplate( "effect_" + pItem.name, this._prefix + ":" + pItem.name, _effectName, pItem.item_replacement, pItem.activation_domain );
 			pResetEvent.remove.component_groups.push( _effectName );
+			timerGroups.push( _effectName );
+			if(pItem.focus_behavior.consume_effect.allow_renewing) {
+				_mEvent.sequence[2].filters.all_of.splice(1, 1);
+			}
 		}
 		else {
 			var _mEvent = { };
@@ -96,6 +101,10 @@ class ItemBuilder {
 			_mEvent.remove = { component_groups: [ ] };
 			
 			_mEvent.add.component_groups.push( _cGroup );
+
+			if(_mEvent.remove.component_groups.length == 0) {
+				delete _mEvent.remove;
+			}
 		}
 
 		pResetEvent.remove.component_groups.push( _cGroup );
@@ -106,11 +115,11 @@ class ItemBuilder {
 		var _component_group = pItem.on_use.add_components;
 
 		if(pItem.focus_behavior.consumable) {
-			_component_group["minecraft:family"] = {
-				family: [ "player", this._prefix + ":effect_" + pItem.name, "active_effect"  ]
+			_component_group["minecraft:type_family"] = {
+				family: [ "player", "effect_" + pItem.name, "active_effect"  ]
 			}
 
-			itemJSON.force_component_reset["minecraft:family"] = {
+			itemJSON.force_component_reset["minecraft:type_family"] = {
 				family: [ "player", "standard", "no_effect"  ]
 			}
 		}
@@ -124,15 +133,24 @@ class ItemBuilder {
 
 	finishEvents(pItems, pComponentGroups) {
 		var _consumableItems = this.getConsumableItems(pItems);
+		var _groupsWithoutTimers = [];
+		_groupsWithoutTimers.copy(pComponentGroups);
+		this.removeAllTimerGroups( _groupsWithoutTimers );
+
 		for(var i = 0; i < _consumableItems.length; i++) {
 			var _tmp = [];
 			var _effect = _consumableItems[i].focus_behavior.consume_effect;
-			var _effectName = this._prefix + ":active_" +_consumableItems[i].name + "_timer_" + _effect.duration + "s";
-			_tmp.copy(pComponentGroups);
+			var _effectName = this._prefix + ":active_" +_consumableItems[i].name + "_timer";
+			_tmp.copy(_groupsWithoutTimers);
 
 			_tmp.removeObject( this._prefix + ":" + _consumableItems[i].name );
-			_tmp.removeObject( _effectName );
 			this._events[ eB.getEventName( _consumableItems[i] ) ].sequence[0].remove.component_groups = _tmp;
+		}
+	}
+
+	removeAllTimerGroups(pArray) {
+		for(var i = 0; i < timerGroups.length; i++) {
+			pArray.removeObject( timerGroups[i] );
 		}
 	}
 

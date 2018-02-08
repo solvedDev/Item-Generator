@@ -26,38 +26,25 @@ Array.prototype.copy = function(pArray) {
 }
 
 class EffectEventTemplate {
-	constructor(pEffect, pComponentGroupName, pEffectComponentGroup, pActivationItem) {
+	constructor(pEffect, pComponentGroupName, pEffectComponentGroup, pActivationItem, pActivationDomain) {
 		this.sequence = [
 			{
-				filters: { 
-					all_of: [
-						{ test: "is_family", subject: "self", value: pEffect }
-					]
-				},
+				filters: { test: "is_family", subject: "self", value: pEffect },
+				add: {  component_groups: [ pComponentGroupName ] },
 				remove: { component_groups: [  ]  }
 			},
 			{
-				filters: { test: "has_component", operator: "not", target: "self", value: "minecraft:timer" },
+				filters: { test: "is_family", target: "self", value: "no_effect" },
 				add: {  component_groups: [ pComponentGroupName, pEffectComponentGroup ] }
 			},
 			{
 				filters: { 
 					all_of: [
-						{ test: "has_equipment", subject: "self", domain: "hand", value: pActivationItem },
-						{ test: "is_family", subject: "self", value: pEffect },
-						{ test: "has_component", target: "self", value: "minecraft:timer" }
+						{ test: "has_equipment", subject: "self", domain: pActivationDomain, value: pActivationItem },
+						{ test: "is_family", target: "self", value: "no_effect" }
 					]
 			  	},
 			  	add: {  component_groups: [ pComponentGroupName, pEffectComponentGroup ] }
-			},
-			{
-			  	filters: { 
-					all_of: [
-						{ test: "is_family", subject: "self", value: pEffect },
-						{ test: "has_component", target: "self", value: "minecraft:timer" }
-					]
-			 	},
-			 	add: {  component_groups: [ pComponentGroupName ] }
 			}
 		]
 	}
