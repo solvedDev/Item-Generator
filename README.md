@@ -151,7 +151,7 @@ A basic consumable item looks like this:
 }
 ```
 
-You add two custom items like this:
+One can add two custom items like this:
 ```javascript
 {
 	"project": {
