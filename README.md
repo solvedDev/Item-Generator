@@ -150,3 +150,45 @@ A basic consumable item looks like this:
 	}
 }
 ```
+
+You add two custom items like this:
+```javascript
+{
+	"project": {
+		"name": "exampleName",
+		"prefix": "example"
+	},
+	"items": [
+		{
+			"name": "ruby_sword",
+			"item_replacement": "wooden_hoe",
+			"activation_domain": "hand",
+			"focus_behavior": {
+				"consumable": false
+			},
+			"on_use": {
+				"add_components": {
+					"minecraft:attack": {
+						"damage": 9
+					}
+				}
+			}
+		},
+		{
+			"name": "emerald_sword",
+			"item_replacement": "stone_hoe",
+			"activation_domain": "hand",
+			"focus_behavior": {
+				"consumable": false
+			},
+			"on_use": {
+				"add_components": {
+					"minecraft:attack": {
+						"damage": 6
+					}
+				}
+			}
+		}
+	]
+}
+```
