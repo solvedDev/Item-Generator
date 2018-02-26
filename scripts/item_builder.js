@@ -91,8 +91,8 @@ class ItemBuilder {
 			var _mEvent = new EffectEventTemplate( "effect_" + pItem.name, this._prefix + ":" + pItem.name, _effectName, pItem.item_replacement, pItem.activation_domain );
 			pResetEvent.remove.component_groups.push( _effectName );
 			timerGroups.push( _effectName );
-			if(pItem.focus_behavior.consume_effect.allow_renewing) {
-				_mEvent.sequence[2].filters.all_of.splice(1, 1);
+			if(! pItem.focus_behavior.consume_effect.allow_renewing) {
+				_mEvent.sequence[2].filters.any_of.splice(1, 1);
 			}
 		}
 		else {

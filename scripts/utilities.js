@@ -40,8 +40,11 @@ class EffectEventTemplate {
 			{
 				filters: { 
 					all_of: [
-						{ test: "has_equipment", subject: "self", domain: pActivationDomain, value: pActivationItem },
-						{ test: "is_family", target: "self", value: "no_effect" }
+						{ test: "has_equipment", subject: "self", domain: pActivationDomain, value: pActivationItem }
+					],
+					any_of: [
+						{ test: "is_family", target: "self", value: "no_effect" },
+						{ test: "is_family", target: "self", value: pEffect }
 					]
 			  	},
 			  	add: {  component_groups: [ pComponentGroupName, pEffectComponentGroup ] }
