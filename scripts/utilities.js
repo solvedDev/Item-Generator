@@ -1,3 +1,25 @@
+var zip = new JSZip();
+var loot_tables_folder;
+var entities_folder = zip.folder("entities");
+
+function addToZip(pFolder, pFilename, pText, pOption) {
+	if(!loot_tables_folder) loot_tables_folder = zip.folder("loot_tables/" + prefix);
+	if(!pFolder) pFolder = loot_tables_folder;
+	pFolder.file(pFilename, pText, pOption);
+}
+
+function downloadAll() {
+	zip.generateAsync({type:"blob"})
+	.then(function(content) {
+		if(!checkboxZip.checked) {
+			saveAs(content, projectName + ".mcpack");
+		}
+		else {
+			saveAs(content, projectName + ".zip");
+		}
+	});
+}
+
 function download(filename, text) {
 	var element = document.createElement('a');
 	element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
@@ -150,3 +172,35 @@ class EventBuilder {
 		return _eventName;
 	}
 }
+
+class Manifest {
+	constructor() {
+		this.format_version = 1;
+		this.header = {
+			description: projectDescription + " | Created with @solvedDev Item Generator",
+			name: projectName,
+			uuid: generateUUID(),
+			version: projectVersion
+		}
+		
+		this.modules = [
+			{
+				description: prefix + " data",
+				type: "data",
+				uuid: generateUUID(),
+				version: [1, 0, 0]
+			}
+		]
+	}
+}
+
+//From https://jsfiddle.net/briguy37/2MVFd/
+function generateUUID() {
+    var d = new Date().getTime();
+    var uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+        var r = (d + Math.random()*16)%16 | 0;
+        d = Math.floor(d/16);
+        return (c=='x' ? r : (r&0x3|0x8)).toString(16);
+    });
+    return uuid;
+};

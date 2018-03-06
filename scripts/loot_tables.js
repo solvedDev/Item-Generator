@@ -25,7 +25,7 @@ class LootTable {
 	}
 
 	downloadTable() {
-		download( this._name + ".json", this.getJSON() );
+		addToZip( loot_tables_folder, this._name + ".json", this.getJSON() );
 	}
 }
 

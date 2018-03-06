@@ -33,6 +33,10 @@
 			<i class="material-icons">done</i>
 		</div>
 		<br>
+		<br>
+		<input type="checkbox" id="package-zip" name="package-zip">
+		<label for="package-zip">package as .zip</label>
+		<br>
 
 		<button id="parse-json">
 			<p>Parse</p>
@@ -40,6 +44,16 @@
 		</button>
 	</div>
 
+	<script>
+		var prefix;
+		var projectName;
+		var projectDescription;
+		var projectVersion;
+		var checkboxZip = document.getElementById("package-zip");
+	</script>
+	<script src="scripts/img.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.5/jszip.js"></script>
+	<script src="scripts/FileSaver.js"></script>
 	<script src="scripts/utilities.js"></script>
 	<script src="scripts/loot_tables.js"></script>
 	<script src="scripts/item_builder.js"></script>

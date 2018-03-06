@@ -2,7 +2,7 @@
 This generator simplifies the process of adding custom items to Minecraft Bedrock. The result of this generator can be part of a normal Minecraft addon and is therefor fully compatible with every Bedrock platform.
 
 ## How it works
-Visit https://solveddev.github.io/Item-Generator. Alternatively, download this repository, navigate to the index.html file and open it in your browser. Now select the file to which you want to add a custom item behavior (logical choice: player.json). The second file you need to select is a file where you have described your new item behavior. To learn the syntax, scroll further down. After you have selected both files, click "Parse" and you will get the edited player.json (saved in your "Downloads"-folder).
+Visit https://solveddev.github.io/Item-Generator. Alternatively, download this repository, navigate to the index.html file and open it in your browser. Now select the file to which you want to add a custom item behavior (logical choice: player.json). The second file you need to select is a file where you have described your new item behavior. To learn the syntax, scroll further down. After you have selected both files, click "Parse" and you will get the edited player.json (saved in your "Downloads"-folder as a .zip or .mcpack file). The download includes a pack icon and a completely set up manifest.json. This means you can just click the downloaded file (if you have chosen the .mcpack download) and quickly test your items while working on them.
 
 ## The syntax
 The syntax I invented is both simple & logical. Below, one can see all at the moment implemented options. You can also find examples further down...
@@ -11,6 +11,8 @@ The syntax I invented is both simple & logical. Below, one can see all at the mo
 {
 	"project": {
 		"name": "exampleName",
+		"description": "example example example",
+		"version": [1, 0, 0],
 		"prefix": "example"
 	},
 	"items": [
@@ -62,7 +64,7 @@ The syntax I invented is both simple & logical. Below, one can see all at the mo
 	"force_component_removal": [ "minecraft:attack" ]
 }
 ```
-Within the ```project``` object, one defines a prefix for the whole project. One can find this ```prefix``` in front of all component groups and events. The project ```name``` doesn't really matter at the moment.
+Within the ```project``` object, one defines a prefix for the whole project. One can find this ```prefix``` in front of all component groups and events. The arguments ```name```, ```description``` and ```version``` are used to generate the manifest.json.
 
 After the project definition, one defines the items.
 1. ```name``` = The unique (!) name of the item  
@@ -85,6 +87,8 @@ Here's the most basic layout of a custom (non-consumable) item:
 {
 	"project": {
 		"name": "exampleName",
+		"description": "example example example",
+		"version": [1, 0, 0],
 		"prefix": "example"
 	},
 	"items": [
@@ -113,6 +117,8 @@ A basic consumable item looks like this:
 {
 	"project": {
 		"name": "exampleName",
+		"description": "example example example",
+		"version": [1, 0, 0],
 		"prefix": "example"
 	},
 	"items": [
@@ -156,6 +162,8 @@ One can add two custom items like this:
 {
 	"project": {
 		"name": "exampleName",
+		"description": "example example example",
+		"version": [1, 0, 0],
 		"prefix": "example"
 	},
 	"items": [
@@ -192,3 +200,10 @@ One can add two custom items like this:
 	]
 }
 ```
+
+## Technologies used:
+JSZip: https://stuk.github.io/jszip/
+
+FileSaver.js: https://github.com/eligrey/FileSaver.js/
+
+UUID-generator from: https://jsfiddle.net/briguy37/2MVFd/
