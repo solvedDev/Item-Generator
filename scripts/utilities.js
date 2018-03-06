@@ -177,7 +177,7 @@ class Manifest {
 	constructor() {
 		this.format_version = 1;
 		this.header = {
-			description: projectDescription + " | Created with @solvedDev Item Generator",
+			description: projectDescription + " | Created with @solvedDev's Item Generator",
 			name: projectName,
 			uuid: generateUUID(),
 			version: projectVersion
