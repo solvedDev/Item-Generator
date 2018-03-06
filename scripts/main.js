@@ -1,6 +1,5 @@
 var devBuild = false;
 var items = [];
-var prefix;
 var components;
 var itemJSON;
 var entityJSON;
@@ -68,10 +67,13 @@ document.getElementById("parse-json").addEventListener("click", function(){
 	
 			items = itemJSON.items;
 			prefix = itemJSON.project.prefix;
+			projectName = itemJSON.project.name;
+			projectDescription = itemJSON.project.description;
+			projectVersion = itemJSON.project.version;
 		
 			toMinecraftJSON(items);
 	
-			if(!devBuild) location.reload();
+			location.reload();
 		} 
 		catch(error) {
 			var _errorDiv = document.querySelector(".error");
@@ -82,10 +84,11 @@ document.getElementById("parse-json").addEventListener("click", function(){
 	else {
 		items = itemJSON.items;
 		prefix = itemJSON.project.prefix;
+		projectName = itemJSON.project.name;
+		projectDescription = itemJSON.project.description;
+		projectVersion = itemJSON.project.version;
 	
 		toMinecraftJSON(items);
-
-		if(!devBuild) location.reload();
 	}
 });
 
@@ -174,7 +177,12 @@ function combineJSON(pEnvironment_sensor, pEvents, pComponent_groups) {
 	var result = JSON.stringify(entityJSON, null, "\t");
 
 	console.log(result);
-	download(editedFile, result);
+	addToZip(entities_folder, editedFile, result);
+	addToZip(zip, "manifest.json", JSON.stringify(new Manifest(), null, "\t"));
+
+	addToZip(zip, "pack_icon.png", _img, {base64: true});
+
+	downloadAll();
 }
 
 function getComponentGroupNames(pComponentGroups) {
