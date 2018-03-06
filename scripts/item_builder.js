@@ -20,7 +20,7 @@ class ItemBuilder {
 
 			var _tmp = pItem.focus_behavior.turn_into;
 			var table = new LootTable( "consume_" + pItem.name, _tmp.item_name, _tmp.item_data, _tmp.item_count );
-			table.downloadTable();
+			table.addTableToZip();
 
 			this.buildEffectTimer(pItem);
 
