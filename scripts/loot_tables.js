@@ -24,8 +24,8 @@ class LootTable {
 		return JSON.stringify( this._rawTable, null, "\t" );
 	}
 
-	downloadTable() {
-		addToZip( loot_tables_folder, this._name + ".json", this.getJSON() );
+	addTableToZip() {
+		addToDataZip( "loot_tables/" + prefix + "/" + this._name + ".json", this.getJSON() );
 	}
 }
 

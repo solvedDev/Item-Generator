@@ -1,4 +1,4 @@
-var devBuild = false;
+var devBuild = true;
 var items = [];
 var components;
 var itemJSON;
@@ -26,76 +26,33 @@ function updateGUI() {
 	}
 }
 
-//GUI
-document.getElementById("json-input").addEventListener("change", function(){
-	var fileList = this.files;
+function loadJSON(pIsItem, pFiles) {
+	var fileList = pFiles;
 	var reader = new FileReader();
 	
 	//Reading file
 	reader.readAsText(fileList[0]);
-	reader.callback = updateGUI;
+	reader.callback = window.updateGUI;
+	if(!pIsItem) editedFile = fileList[0].name;
+
 	reader.onload = function() {
-		itemJSON = JSON.parse(reader.result);
-		
+		if(pIsItem) itemJSON = JSON.parse(reader.result);
+		if(!pIsItem) entityJSON = JSON.parse(reader.result);
 		this.callback();
 	};
-});
+}
 
-document.getElementById("apply-to-file").addEventListener("change", function(){
-	var fileList = this.files;
-	var reader = new FileReader();
-	
-	//Reading file
-	reader.readAsText(fileList[0]);
-	editedFile = fileList[0].name;
-	reader.callback = updateGUI;
-	reader.onload = function() {
-		entityJSON = JSON.parse(reader.result);
-		
-		this.callback();
-	};
-});
+function setProjectData() {
+	items = itemJSON.items;
 
-document.getElementById("parse-json").addEventListener("click", function(){
-	updateGUI();
+	prefix = itemJSON.project.prefix;
+	projectName = itemJSON.project.name;
+	projectDescription = itemJSON.project.description;
+	projectVersion = itemJSON.project.version;
+	fallbackItemName = itemJSON.project.fallback_item_name;
+}
 
-	if(!devBuild) {
-		try {
-			if(!itemJSON || !entityJSON) {
-				throw new Error("Please select all files first!");
-			}
-	
-			items = itemJSON.items;
-			prefix = itemJSON.project.prefix;
-			projectName = itemJSON.project.name;
-			projectDescription = itemJSON.project.description;
-			projectVersion = itemJSON.project.version;
-		
-			toMinecraftJSON(items);
-	
-			location.reload();
-		} 
-		catch(error) {
-			var _errorDiv = document.querySelector(".error");
-			_errorDiv.lastChild.textContent = " " + error.message;
-			_errorDiv.style.display = "inline-block";
-		}
-	}
-	else {
-		items = itemJSON.items;
-		prefix = itemJSON.project.prefix;
-		projectName = itemJSON.project.name;
-		projectDescription = itemJSON.project.description;
-		projectVersion = itemJSON.project.version;
-	
-		toMinecraftJSON(items);
-	}
-});
-
-
-//MAIN
 function toMinecraftJSON(pItems) {
-	console.log("Started parsing items.json...");
 
 	components = { };
 	var resetEvent = { add: { component_groups: [ prefix + ":standard_player" ] }, remove: { component_groups: [ ] } };
@@ -106,7 +63,7 @@ function toMinecraftJSON(pItems) {
 	var component_groups = { };
 	
 	//ItemBuilder
-	iB = new ItemBuilder(prefix, environment_sensor, events, component_groups);
+	iB = new ItemBuilder(environment_sensor, events, component_groups);
 	var _consumableItems = iB.getConsumableItems(pItems);
 	
 	//Building the player reset sensor
@@ -140,17 +97,12 @@ function toMinecraftJSON(pItems) {
 
 	//Combining the JSON and creating the output file
 	removeEmptyFilters(environment_sensor);
-	combineJSON( environment_sensor, events, component_groups );
+	packageAddon( combineJSON( environment_sensor, events, component_groups ) );
 }
 
 function buildStandardComponentGroup() {
-	console.log("Started building standard player...");
-	console.log(components);
 	for(var key in components) {
-		console.log(entityJSON["minecraft:entity"].components[key]);
 		components[key] = entityJSON["minecraft:entity"].components[key];
-		console.log(entityJSON["minecraft:entity"].components[key]);
-		console.log(components[key]);
 		delete entityJSON["minecraft:entity"].components[key];
 	}
 
@@ -168,21 +120,56 @@ function buildStandardComponentGroup() {
 }
 
 function combineJSON(pEnvironment_sensor, pEvents, pComponent_groups) {
-	console.log("Started combining JSON...");
-
 	entityJSON["minecraft:entity"].components["minecraft:environment_sensor"] = pEnvironment_sensor;
 	entityJSON["minecraft:entity"].component_groups = pComponent_groups;
 	entityJSON["minecraft:entity"].events = pEvents;
 
-	var result = JSON.stringify(entityJSON, null, "\t");
+	return JSON.stringify(entityJSON, null, "\t");
+}
 
-	console.log(result);
-	addToZip(entities_folder, editedFile, result);
-	addToZip(zip, "manifest.json", JSON.stringify(new Manifest(), null, "\t"));
+async function packageAddon(pEntityJSON) {
+	addToDataZip("entities/" + editedFile, pEntityJSON);
 
-	addToZip(zip, "pack_icon.png", _img, {base64: true});
+	if(checkboxRes.checked) {
+		var rUUID = generateUUID();
+		var rManifest = new Manifest("resources", rUUID, generateUUID());
+		var dManifest = new Manifest("data", generateUUID(), generateUUID(), rUUID);
 
-	downloadAll();
+		addToResourceZip("manifest.json", JSON.stringify(rManifest, null, "\t"));
+		addToResourceZip("pack_icon.png", iconIMG, {base64: true});
+
+		generateAllItemPictures(items);
+		generateAllLangFiles();
+
+		if(editedTerrainTextures) addToResourceZip("textures/terrain_texture.json", JSON.stringify(tmpTerrainTextures, null, "\t"));
+	}
+	else {
+		var dManifest = new Manifest("data", generateUUID(), generateUUID());
+	}
+	
+	addToDataZip("manifest.json", JSON.stringify(dManifest, null, "\t"));
+	addToDataZip("pack_icon.png", iconIMG, {base64: true});
+
+	if(!checkboxZip.checked && checkboxRes.checked) {
+		getAddon();
+	}
+	else {
+		downloadZip(dataZip, "Data");	
+		if(checkboxRes.checked) downloadZip(resourceZip, "Res");
+	}
+}
+
+async function getAddon() {
+	var _data = await getZip(dataZip);
+	var _res = await getZip(resourceZip);
+
+	projectZip.file(projectName + " Data.mcpack", _data);
+	projectZip.file(projectName + " Res.mcpack", _res);
+
+	projectZip.generateAsync({type:"blob"})
+		.then(function(content) {
+			saveAs(content, projectName +  ".mcaddon");
+		});
 }
 
 function getComponentGroupNames(pComponentGroups) {

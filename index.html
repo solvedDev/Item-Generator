@@ -20,7 +20,7 @@
 
 	<div class="main">
 		<div class="input">
-			<label for="apply-to-file">Entity JSON</label>
+			<label for="apply-to-file" class="file-input">Entity JSON</label>
 			<input type="file" id="apply-to-file" name="apply-to-file">
 			<i class="material-icons">done</i>
 		</div>
@@ -28,10 +28,14 @@
 		<br>
 
 		<div class="input">
-			<label for="json-input">Item JSON</label>
+			<label for="json-input" class="file-input">Item JSON</label>
 			<input type="file" id="json-input" name="json-input">
 			<i class="material-icons">done</i>
 		</div>
+		<br>
+		<br>
+		<input type="checkbox" id="res-pack" name="res-pack">
+		<label for="res-pack">create resource pack</label>
 		<br>
 		<br>
 		<input type="checkbox" id="package-zip" name="package-zip">
@@ -44,19 +48,29 @@
 		</button>
 	</div>
 
+	<script src="data/texture_data.js"></script>
+	<script src="data/imgs.js"></script>
 	<script>
-		var prefix;
+		var prefix = "unknown_prefix";
 		var projectName;
 		var projectDescription;
 		var projectVersion;
+		var fallbackItemName = "No fallback item name defined";
+
 		var checkboxZip = document.getElementById("package-zip");
+		var checkboxRes = document.getElementById("res-pack");
+		var itemTextures;
+
+		//Set defaults
+		checkboxRes.checked = true;
 	</script>
-	<script src="scripts/img.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.5/jszip.js"></script>
 	<script src="scripts/FileSaver.js"></script>
 	<script src="scripts/utilities.js"></script>
 	<script src="scripts/loot_tables.js"></script>
 	<script src="scripts/item_builder.js"></script>
+	<script src="scripts/resource_packer.js"></script>
 	<script src="scripts/main.js"></script>
+	<script src="scripts/UI.js"></script>
 </body>
 </html>

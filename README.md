@@ -13,11 +13,13 @@ The syntax I invented is both simple & logical. Below, one can see all at the mo
 		"name": "exampleName",
 		"description": "example example example",
 		"version": [1, 0, 0],
-		"prefix": "example"
+		"prefix": "example",
+		"fallback_item_name": "Example Item"
 	},
 	"items": [
 		{
 			"name": "test",
+			"show_name": "example",
 			"item_replacement": "wooden_sword",
 			"activation_domain": "hand",
 			"filters": {
@@ -64,15 +66,16 @@ The syntax I invented is both simple & logical. Below, one can see all at the mo
 	"force_component_removal": [ "minecraft:attack" ]
 }
 ```
-Within the ```project``` object, one defines a prefix for the whole project. One can find this ```prefix``` in front of all component groups and events. The arguments ```name```, ```description``` and ```version``` are used to generate the manifest.json.
+Within the ```project``` object, one defines a prefix for the whole project. One can find this ```prefix``` in front of all component groups and events. The arguments ```name```, ```description``` and ```version``` are used to generate the manifest.json. A ```fallback_item_name``` gets used whenever only one translation can be applied to multiple items.
 
 After the project definition, one defines the items.
 1. ```name``` = The unique (!) name of the item  
-2. ```item_replacement``` = The item to apply the new behavior to. In order to use data values, simply enter them behind the item ("dye:4").  
-3. ```activation_domain``` = Where the item has to be in order to be considered "activated". Valid inputs are the ones supported by the has_equipment filter by Minecraft (any, armor, feet, hand, head, leg, torso).
-4. ```filters```: Define additional filters for the item here. The syntax follows the normal Minecraft filters.
-5. ```focus_behavior``` = Define what happens if the player holds the item here. ```consumable``` allows to input *true*/*false* and ```turn_into``` defines which item the player holds after consuming the original item. Use ```consume_effect``` to define how long the component groups stay on the player and whether the effect can be re-applied before it ran out (```allow_renewing```). Advanced users can also define a ```custom_remove_event``` here..
-6. ```on_use``` = Put the components which shall be added while holding/using the item into the ```add_components``` object. The syntax follows the default Minecraft syntax and one can input any component though some might not work or cause Minecraft to crash. Define a ```custom_event``` to fire when the player holds this item. The automatically generated events follow this naming convention: *prefix:holds_itemName*, *prefix:on_itemName_use* and *prefix:reset_player*. Normally, one doesn't need the custom event so just do not use it if you don't know what you do! The other arguments are a work-in-progress.
+2. ```show_name``` = The name visible to player in-game
+3. ```item_replacement``` = The item to apply the new behavior to. In order to use data values, simply enter them behind the item ("dye:4").  
+4. ```activation_domain``` = Where the item has to be in order to be considered "activated". Valid inputs are the ones supported by the has_equipment filter by Minecraft (any, armor, feet, hand, head, leg, torso)
+5. ```filters```: Define additional filters for the item here. The syntax follows the normal Minecraft filters
+6. ```focus_behavior``` = Define what happens if the player holds the item here. ```consumable``` allows to input *true*/*false* and ```turn_into``` defines which item the player holds after consuming the original item. Use ```consume_effect``` to define how long the component groups stay on the player and whether the effect can be re-applied before it ran out (```allow_renewing```). Advanced users can also define a ```custom_remove_event``` here
+7. ```on_use``` = Put the components which shall be added while holding/using the item into the ```add_components``` object. The syntax follows the default Minecraft syntax and one can input any component though some might not work or cause Minecraft to crash. Define a ```custom_event``` to fire when the player holds this item. The automatically generated events follow this naming convention: *prefix:holds_itemName*, *prefix:on_itemName_use* and *prefix:reset_player*. Normally, one doesn't need the custom event so just do not use it if you don't know what you do! The other arguments are a work-in-progress
 
 Some components aren't part of the standard entity. One might need to add these components to the ```force_component_reset``` argument. Make sure to define all needed default arguments.
 
@@ -89,11 +92,13 @@ Here's the most basic layout of a custom (non-consumable) item:
 		"name": "exampleName",
 		"description": "example example example",
 		"version": [1, 0, 0],
-		"prefix": "example"
+		"prefix": "example",
+		"fallback_item_name": "Sword"
 	},
 	"items": [
 		{
 			"name": "ruby_sword",
+			"show_name": "Ruby Sword",
 			"item_replacement": "wooden_hoe",
 			"activation_domain": "hand",
 			"focus_behavior": {
@@ -119,11 +124,13 @@ A basic consumable item looks like this:
 		"name": "exampleName",
 		"description": "example example example",
 		"version": [1, 0, 0],
-		"prefix": "example"
+		"prefix": "example",
+		"fallback_item_name": "Potion"
 	},
 	"items": [
 		{
 			"name": "health_boost_potion",
+			"show_name": "Health Boost Potion",
 			"item_replacement": "yellow_flower:1",
 			"activation_domain": "hand",
 			"focus_behavior": {
@@ -164,11 +171,13 @@ One can add two custom items like this:
 		"name": "exampleName",
 		"description": "example example example",
 		"version": [1, 0, 0],
-		"prefix": "example"
+		"prefix": "example",
+		"fallback_item_name": "Sword"
 	},
 	"items": [
 		{
 			"name": "ruby_sword",
+			"show_name": "Ruby Sword",
 			"item_replacement": "wooden_hoe",
 			"activation_domain": "hand",
 			"focus_behavior": {
@@ -184,6 +193,7 @@ One can add two custom items like this:
 		},
 		{
 			"name": "emerald_sword",
+			"show_name": "Emerald Sword",
 			"item_replacement": "stone_hoe",
 			"activation_domain": "hand",
 			"focus_behavior": {
