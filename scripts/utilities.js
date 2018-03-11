@@ -1,23 +1,40 @@
-var zip = new JSZip();
-var loot_tables_folder;
-var entities_folder = zip.folder("entities");
+var projectZip = new JSZip();
+var dataZip = new JSZip();
+var resourceZip = new JSZip();
+var tmpZip;
 
-function addToZip(pFolder, pFilename, pText, pOption) {
-	if(!loot_tables_folder) loot_tables_folder = zip.folder("loot_tables/" + prefix);
-	if(!pFolder) pFolder = loot_tables_folder;
-	pFolder.file(pFilename, pText, pOption);
+
+function addToDataZip(pFileName, pText, pOption) {
+	dataZip.file(pFileName, pText, pOption);
 }
 
-function downloadAll() {
-	zip.generateAsync({type:"blob"})
+function addToResourceZip(pFileName, pText, pOption) {
+	resourceZip.file(pFileName, pText, pOption);
+}
+
+function addToProjectZip(pFileName, pText, pOption) {
+	projectZip.file(pFileName, pText, pOption);
+}
+
+async function downloadZip(pType, pTypeString) {
+	pType.generateAsync({type:"blob"})
 	.then(function(content) {
 		if(!checkboxZip.checked) {
-			saveAs(content, projectName + ".mcpack");
+			saveAs(content, projectName + " " + pTypeString + ".mcpack");
 		}
 		else {
-			saveAs(content, projectName + ".zip");
+			saveAs(content, projectName + " " + pTypeString + ".zip");
 		}
 	});
+}
+
+async function getZip(pZip) {
+	await pZip.generateAsync({type:"blob"})
+		.then(function(content) {
+			tmpZip = content;
+		});
+
+	return tmpZip;
 }
 
 function download(filename, text) {
@@ -155,42 +172,47 @@ class EventBuilder {
 	}
 
 	getEventName(pItem) {
-		var _eventName;
-
 		if(pItem.on_use.custom_event) {
-			_eventName = pItem.on_use.custom_event;
+			return pItem.on_use.custom_event;
 		}
 		else {
 			if(pItem.focus_behavior.consumable) {
-				_eventName = prefix + ":on_" + pItem.name + "_use";
+				return prefix + ":on_" + pItem.name + "_use";
 			}
 			else {
-				_eventName = prefix + ":holds_" + pItem.name;
+				return prefix + ":holds_" + pItem.name;
 			}
 		}
-
-		return _eventName;
 	}
 }
 
 class Manifest {
-	constructor() {
+	constructor(pType, pUUID1, pUUID2, pUUIDResources) {
 		this.format_version = 1;
 		this.header = {
 			description: projectDescription + " | Created with @solvedDev's Item Generator",
 			name: projectName,
-			uuid: generateUUID(),
+			uuid: pUUID1,
 			version: projectVersion
 		}
 		
 		this.modules = [
 			{
-				description: prefix + " data",
-				type: "data",
-				uuid: generateUUID(),
+				description: prefix + " " + pType,
+				type: pType,
+				uuid: pUUID2,
 				version: [1, 0, 0]
 			}
 		]
+
+		if(pType == "data" && pUUIDResources) {
+			this.dependencies = [
+				{
+					uuid: pUUIDResources,
+					version: projectVersion
+				}
+			]
+		}
 	}
 }
 
@@ -204,3 +226,35 @@ function generateUUID() {
     });
     return uuid;
 };
+
+var languages = [
+	"en_US",
+	"en_GB",
+	"de_DE",
+	"es_ES",
+	"es_MX",
+	"fr_FR",
+	"fr_CA",
+	"it_IT",
+	"ja_JP",
+	"ko_KR",
+	"pt_BR",
+	"pt_PT",
+	"ru_RU",
+	"zh_CN",
+	"zh_TW",
+	"nl_NL",
+	"bg_BG",
+  	"cs_CZ",
+	"da_DK",
+	"el_GR",
+	"fi_FI",
+	"hu_HU",
+	"id_ID",
+	"nb_NO",
+	"pl_PL",
+	"sk_SK",
+	"sv_SE",
+	"tr_TR",
+	"uk_UA"
+]

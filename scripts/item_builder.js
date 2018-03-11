@@ -2,8 +2,7 @@ var totalConsumableItems = 0;
 var timerGroups = [];
 
 class ItemBuilder {
-	constructor(pPrefix, pEnvironment_sensor, pEvents, pComponent_groups) {
-		this._prefix = pPrefix;
+	constructor(pEnvironment_sensor, pEvents, pComponent_groups) {
 		this._environment_sensor = pEnvironment_sensor;
 		this._events = pEvents;
 		this._component_groups = pComponent_groups;
@@ -18,8 +17,8 @@ class ItemBuilder {
 				throw new Error("Please define an item under 'turn_into'!");
 			}
 
-			var _tmp = pItem.focus_behavior.turn_into;
-			var table = new LootTable( "consume_" + pItem.name, _tmp.item_name, _tmp.item_data, _tmp.item_count );
+			var _t_i = pItem.focus_behavior.turn_into;
+			var table = new LootTable( "consume_" + pItem.name, _t_i.item_name, _t_i.item_data, _t_i.item_count );
 			table.addTableToZip();
 
 			this.buildEffectTimer(pItem);
@@ -38,18 +37,18 @@ class ItemBuilder {
 			this._events[eB.getEventName(pItem)] = this.buildEvent(pItem, pResetEvent);
 			
 			//Component Group
-			this._component_groups[ this._prefix + ":" + pItem.name ] = this.buildComponentGroup(pItem);
+			this._component_groups[ prefix + ":" + pItem.name ] = this.buildComponentGroup(pItem);
 		}
 	}
 
 	buildEffectTimer(pItem) {
 		var _effect = pItem.focus_behavior.consume_effect;
-		var _effectName = this._prefix + ":active_" + pItem.name + "_timer";
+		var _effectName = prefix + ":active_" + pItem.name + "_timer";
 		if(_effect.custom_remove_event) {
-			var _tGT = new TimerGroupTemplate(_effect.duration, _effect.custom_remove_event, this._prefix + "/consume_" + pItem.name + ".json");
+			var _tGT = new TimerGroupTemplate(_effect.duration, _effect.custom_remove_event, prefix + "/consume_" + pItem.name + ".json");
 		}
 		else {
-			var _tGT = new TimerGroupTemplate(_effect.duration, this._prefix + ":reset_player", this._prefix + "/consume_" + pItem.name + ".json");
+			var _tGT = new TimerGroupTemplate(_effect.duration, prefix + ":reset_player", prefix + "/consume_" + pItem.name + ".json");
 		}
 		
 		this._component_groups[ _effectName ] = _tGT;
@@ -82,13 +81,13 @@ class ItemBuilder {
 	}
 
 	buildEvent(pItem, pResetEvent) {
-		var _cGroup = this._prefix + ":" + pItem.name;
+		var _cGroup = prefix + ":" + pItem.name;
 
 		if (pItem.focus_behavior.consumable) {
 			var _effect = pItem.focus_behavior.consume_effect;
-			var _effectName = this._prefix + ":active_" + pItem.name + "_timer";
+			var _effectName = prefix + ":active_" + pItem.name + "_timer";
 
-			var _mEvent = new EffectEventTemplate( "effect_" + pItem.name, this._prefix + ":" + pItem.name, _effectName, pItem.item_replacement, pItem.activation_domain );
+			var _mEvent = new EffectEventTemplate( "effect_" + pItem.name, prefix + ":" + pItem.name, _effectName, pItem.item_replacement, pItem.activation_domain );
 			pResetEvent.remove.component_groups.push( _effectName );
 			timerGroups.push( _effectName );
 			if(! pItem.focus_behavior.consume_effect.allow_renewing) {
@@ -138,13 +137,11 @@ class ItemBuilder {
 		this.removeAllTimerGroups( _groupsWithoutTimers );
 
 		for(var i = 0; i < _consumableItems.length; i++) {
-			var _tmp = [];
-			var _effect = _consumableItems[i].focus_behavior.consume_effect;
-			var _effectName = this._prefix + ":active_" +_consumableItems[i].name + "_timer";
-			_tmp.copy(_groupsWithoutTimers);
+			var _currentResetGroups = [];
 
-			_tmp.removeObject( this._prefix + ":" + _consumableItems[i].name );
-			this._events[ eB.getEventName( _consumableItems[i] ) ].sequence[0].remove.component_groups = _tmp;
+			_currentResetGroups.copy(_groupsWithoutTimers);
+			_currentResetGroups.removeObject( prefix + ":" + _consumableItems[i].name );
+			this._events[ eB.getEventName( _consumableItems[i] ) ].sequence[0].remove.component_groups = _currentResetGroups;
 		}
 	}
 
@@ -154,6 +151,7 @@ class ItemBuilder {
 		}
 	}
 
+	//Turn a normal item group into a group which holds all standardComponents (necessary for consumable item groups)
 	upgradeGroup(pComponents, pStandardComponents) {
 		for(var key in pStandardComponents) {
 			if(!pComponents[key]) {
@@ -162,6 +160,7 @@ class ItemBuilder {
 		}
 	}
 
+	//Returns all consumable items
 	getConsumableItems(pItems) {
 		var _tmp = [];
 		for(var i = 0; i < pItems.length; i++) {
