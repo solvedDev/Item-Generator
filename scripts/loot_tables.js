@@ -26,6 +26,7 @@ class LootTable {
 
 	addTableToZip() {
 		addToDataZip( "loot_tables/" + prefix + "/" + this._name + ".json", this.getJSON() );
+
 	}
 }
 
