@@ -70,7 +70,7 @@ Within the ```project``` object, one defines a prefix for the whole project. One
 
 After the project definition, one defines the items.
 1. ```name``` = The unique (!) name of the item  
-2. ```show_name``` = The name visible to player in-game
+2. ```show_name``` = The name visible to players in-game
 3. ```item_replacement``` = The item to apply the new behavior to. In order to use data values, simply enter them behind the item ("dye:4").  
 4. ```activation_domain``` = Where the item has to be in order to be considered "activated". Valid inputs are the ones supported by the has_equipment filter by Minecraft (any, armor, feet, hand, head, leg, torso)
 5. ```filters```: Define additional filters for the item here. The syntax follows the normal Minecraft filters
