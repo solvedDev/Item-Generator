@@ -2,7 +2,7 @@
 This generator simplifies the process of adding custom items to Minecraft Bedrock. The result of this generator can be part of a normal Minecraft addon and is therefor fully compatible with every Bedrock platform.
 
 ## How it works
-Visit https://solveddev.github.io/Item-Generator. Alternatively, download this repository, navigate to the index.html file and open it in your browser. Now select the file to which you want to add a custom item behavior (logical choice: player.json). The second file you need to select is a file where you have described your new item behavior. To learn the syntax, scroll further down. After you have selected both files, click "Parse" and you will get the edited player.json (saved in your "Downloads"-folder as a .zip or .mcpack file). The download includes a pack icon and a completely set up manifest.json. This means you can just click the downloaded file (if you have chosen the .mcpack download) and quickly test your items while working on them.
+Visit https://solveddev.github.io/Item-Generator. Alternatively, download this repository, navigate to the index.html file and open it in your browser. Now select the file to which you want to add a custom item behavior (logical choice: player.json). The second file you need to select is a file where you have described your new item behavior. To learn the syntax, scroll further down. After you have selected both files, click "Parse" and you will get the edited player.json (saved in your "Downloads"-folder as a .zip, .mcpack or .mcaddon file). The download includes a pack icon and a completely set up manifest.json. This means you can just click the downloaded file (if you have chosen the .mcpack download) and quickly test your items while working on them.
 
 ## The syntax
 The syntax I invented is both simple & logical. Below, one can see all at the moment implemented options. You can also find examples further down...
@@ -82,7 +82,7 @@ Some components aren't part of the standard entity. One might need to add these 
 Some components do not work well with standard values on the player or simply do not need to be resetted. You can force the removal (out of the standard player component group) of a component by adding it to the ```force_component_removal```-array.
 
 ## Loot Tables
-The consumable items need a loot table. This program automatically generates it and you just need create a folder called your ```prefix``` name inside the loot tables folder and put the file inside it.
+Consumable items need loot tables. This program automatically generates them and puts them into a folder called your ```prefix``` name.
 
 ##	Confused?
 Here's the most basic layout of a custom (non-consumable) item:
